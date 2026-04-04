@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S2 Science: Pitch & Loudness Lab</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        h1 { color: #2c3e50; margin-top: 0; }
+        .control-group { margin: 20px 0; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #34495e; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+        .display { font-size: 1.2rem; color: #e67e22; font-weight: bold; margin-top: 5px; }
+        canvas { background: #2c3e50; border-radius: 8px; width: 100%; height: 150px; margin-top: 20px; }
+        .btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+        .btn:hover { background: #2980b9; }
+        .btn.stop { background: #e74c3c; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🔊 Sound Properties Lab</h1>
+    <p>Adjust the sliders to see how sound waves change!</p>
+
+    <button id="toggleBtn" class="btn">Start Sound</button>
+
+    <div class="control-group">
+        <label for="freq">Frequency (Pitch): <span class="display" id="freqVal">440</span> Hz</label>
+        <input type="range" id="freq" min="100" max="2000" step="1" value="440">
+        <p><small><i>Vibrations per second: <span id="vibDisplay">440</span></i></small></p>
+    </div>
+
+    <div class="control-group">
+        <label for="amp">Amplitude (Loudness): <span class="display" id="ampVal">50</span>%</label>
+        <input type="range" id="amp" min="0" max="100" step="1" value="50">
+    </div>
+
+    <canvas id="waveCanvas"></canvas>
+</div>
+
+<script>
+    let audioCtx;
+    let oscillator;
+    let gainNode;
+    let isPlaying = false;
+
+    const freqSlider = document.getElementById('freq');
+    const ampSlider = document.getElementById('amp');
+    const freqVal = document.getElementById('freqVal');
+    const vibDisplay = document.getElementById('vibDisplay');
+    const ampVal = document.getElementById('ampVal');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function initAudio() {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        oscillator = audioCtx.createOscillator();
+        gainNode = audioCtx.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(freqSlider.value, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(ampSlider.value / 100, audioCtx.currentTime);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        if (!audioCtx) initAudio();
+        
+        if (isPlaying) {
+            audioCtx.suspend();
+            toggleBtn.textContent = "Start Sound";
+            toggleBtn.classList.remove('stop');
+        } else {
+            audioCtx.resume();
+            toggleBtn.textContent = "Stop Sound";
+            toggleBtn.classList.add('stop');
+        }
+        isPlaying = !isPlaying;
+    });
+
+    freqSlider.oninput = function() {
+        const val = this.value;
+        freqVal.textContent = val;
+        vibDisplay.textContent = val;
+        if (oscillator) {
+            oscillator.frequency.setTargetAtTime(val, audioCtx.currentTime, 0.05);
+        }
+    };
+
+    ampSlider.oninput = function() {
+        const val = this.value;
+        ampVal.textContent = val;
+        if (gainNode) {
+            gainNode.gain.setTargetAtTime(val / 100, audioCtx.currentTime, 0.05);
+        }
+    };
+
+    // Drawing the wave
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.strokeStyle = '#2ecc71';
+        ctx.lineWidth = 3;
+
+        const frequency = freqSlider.value;
+        const amplitude = ampSlider.value / 2; // Scale for visual
+
+        for (let x = 0; x < canvas.width; x++) {
+            // Formula: y = Amplitude * sin(2 * PI * frequency * time)
+            const y = (canvas.height / 2) + amplitude * Math.sin(x * (frequency / 1000));
+            ctx.lineTo(x, y);
+        }
+
+        ctx.stroke();
+        requestAnimationFrame(draw);
+    }
+    draw();
+</script>
+
+</body>
+</html>
