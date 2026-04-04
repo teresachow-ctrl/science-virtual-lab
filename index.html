@@ -12,6 +12,9 @@
         h1 { text-align: center; font-size: 2.2rem; margin-bottom: 30px; font-weight: 800; letter-spacing: -0.025em; }
         h2 { color: var(--wave-theory); border-left: 6px solid var(--wave-theory); padding-left: 15px; margin-bottom: 20px; font-size: 1.3rem; }
 
+        .definition-list { background: #f1f5f9; padding: 20px 20px 20px 45px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid var(--accent); list-style-type: square; }
+        .definition-list li { margin-bottom: 10px; font-weight: 500; }
+
         .diagram-box { background: var(--primary); border-radius: 12px; padding: 30px 15px; margin: 25px 0; border: 3px solid #334155; }
         
         .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
@@ -31,8 +34,7 @@
 
         .questions-box { background: #fffbeb; border: 2px solid #fef3c7; padding: 25px; border-radius: 12px; margin-top: 20px; }
         .questions-box h3 { margin-top: 0; color: #92400e; font-size: 1.1rem; }
-        .question-item { margin-bottom: 15px; font-weight: 600; color: #451a03; }
-        .question-item span { display: block; font-weight: 400; font-style: italic; color: #78350f; margin-top: 5px; border-bottom: 1px dashed #d97706; width: 100%; height: 25px; }
+        .questions-box p { font-weight: 600; font-size: 1rem; margin-bottom: 12px; color: #451a03; }
     </style>
 </head>
 <body>
@@ -42,6 +44,11 @@
 
     <section>
         <h2>Part 1: Frequency & Hertz</h2>
+        <ul class="definition-list">
+            <li><b>Frequency:</b> The number of complete cycles per second.</li>
+            <li><b>Hertz (Hz):</b> The unit used to measure frequency.</li>
+            <li><b>Human Hearing Range:</b> Approximately 20 Hz to 20,000 Hz.</li>
+        </ul>
         <div class="diagram-box">
             <svg width="100%" height="220" viewBox="0 0 800 220">
                 <line x1="60" y1="30" x2="60" y2="190" stroke="var(--axis)" stroke-width="2" />
@@ -60,14 +67,11 @@
 
     <section>
         <h2>Part 2: Real-Time Wave Analysis</h2>
-        
         <div class="data-grid">
             <div class="data-item"><b>Frequency</b> <span id="freqDisp">440 Hz</span></div>
             <div class="data-item"><b>Loudness (Amplitude)</b> <span id="ampDisp">50%</span></div>
         </div>
-
         <button id="toggleBtn" class="btn-main">▶ START WAVEFORM & AUDIO</button>
-
         <div class="controls">
             <label>Frequency Slider (20 Hz to 20,000 Hz)</label>
             <input type="range" id="freqSlider" min="20" max="20000" step="1" value="440">
@@ -83,14 +87,8 @@
 
         <div class="questions-box">
             <h3>📝 Lab Observations</h3>
-            <div class="question-item">
-                1. What pitch is produced when the frequency is low (e.g., ~100 Hz)?
-                <span></span>
-            </div>
-            <div class="question-item">
-                2. To produce a sound that is both LOUDER and has a HIGHER PITCH, how should you adjust the sliders?
-                <span></span>
-            </div>
+            <p>1. What pitch is produced when the frequency is low (e.g., ~100 Hz)?</p>
+            <p>2. To produce a sound that is both LOUDER and has a HIGHER PITCH, how should you adjust the sliders?</p>
         </div>
     </section>
 </div>
@@ -140,15 +138,12 @@
         const freq = parseFloat(freqSlider.value);
         const amp = (ampSlider.value / 100) * (h / 2);
 
-        if (isPlaying) {
-            globalTime += 0.008; 
-        }
+        if (isPlaying) globalTime += 0.008; 
 
         const adaptiveCycles = 4 + (Math.log10(freq / 20) * 12); 
         ctx1.beginPath();
         ctx1.strokeStyle = "#10b981";
         ctx1.lineWidth = 5;
-        ctx1.lineJoin = "round";
         for (let x = 0; x <= w; x++) {
             const y = midY + Math.sin(((globalTime + x/w) * adaptiveCycles * 2 * Math.PI)) * amp;
             ctx1.lineTo(x + pad, y);
@@ -159,7 +154,6 @@
         ctx2.beginPath();
         ctx2.strokeStyle = "#06b6d4";
         ctx2.lineWidth = 5;
-        ctx2.lineJoin = "round";
         for (let x = 0; x <= w; x++) {
             const y = midY + Math.sin(((globalTime + x/w) * fixedCycles * 2 * Math.PI)) * amp;
             ctx2.lineTo(x + pad, y);
@@ -169,7 +163,7 @@
         const timeWindow = (fixedCycles / freq).toFixed(5);
         ctx2.fillStyle = "white";
         ctx2.font = "bold 12px monospace";
-        ctx2.fillText(`Window Duration: ${timeWindow}s`, w/2, c1.height - 15);
+        ctx2.fillText(`Time Window: ${timeWindow}s`, w/2, c1.height - 15);
 
         document.getElementById('freqDisp').textContent = freq.toLocaleString() + " Hz";
         document.getElementById('ampDisp').textContent = ampSlider.value + "%";
@@ -196,9 +190,6 @@
         ctx.stroke();
         ctx.fillStyle = "#94a3b8";
         ctx.font = "bold 12px sans-serif";
-        ctx.fillText("1.0", pad - 35, 45);
-        ctx.fillText("0", pad - 25, midY + 5);
-        ctx.fillText("-1.0", pad - 40, c1.height - 40);
         ctx.fillText("Time (s) →", c1.width - pad - 60, midY + 20);
     }
 
