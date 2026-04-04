@@ -3,125 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S2 Science: Pitch & Loudness Lab</title>
+    <title>S2 Science: Professional Wave Lab</title>
     <style>
-        body { font-family: sans-serif; background: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        h1 { color: #2c3e50; margin-top: 0; }
-        .control-group { margin: 20px 0; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; color: #34495e; }
-        input[type="range"] { width: 100%; cursor: pointer; }
-        .display { font-size: 1.2rem; color: #e67e22; font-weight: bold; margin-top: 5px; }
-        canvas { background: #2c3e50; border-radius: 8px; width: 100%; height: 150px; margin-top: 20px; }
-        .btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; }
-        .btn:hover { background: #2980b9; }
-        .btn.stop { background: #e74c3c; }
+        :root { --bg: #f8fafc; --card: #ffffff; --primary: #0f172a; --accent: #f59e0b; --wave-theory: #06b6d4; --wave-live: #10b981; --error: #ef4444; --axis: #94a3b8; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--primary); line-height: 1.6; }
+        .container { max-width: 950px; margin: auto; }
+        section { background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        h1 { text-align: center; font-size: 2.2rem; margin-bottom: 30px; font-weight: 800; letter-spacing: -0.025em; }
+        h2 { color: var(--wave-theory); border-left: 6px solid var(--wave-theory); padding-left: 15px; margin-bottom: 20px; font-size: 1.3rem; }
+
+        .definition-list { background: #f1f5f9; padding: 20px 20px 20px 45px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid var(--accent); list-style-type: square; }
+        .definition-list li { margin-bottom: 10px; font-weight: 500; }
+
+        .diagram-box { background: var(--primary); border-radius: 12px; padding: 30px 15px; margin: 25px 0; border: 3px solid #334155; }
+        
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .data-item { background: #ffffff; padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #e2e8f0; }
+        .data-item b { font-size: 0.75rem; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 5px; }
+        .data-item span { font-size: 2rem; color: var(--wave-live); font-weight: 800; }
+
+        .controls { background: #f1f5f9; padding: 30px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        label { font-weight: 700; display: block; margin-bottom: 10px; font-size: 0.95rem; color: #334155; }
+        input[type="range"] { width: 100%; height: 10px; margin-bottom: 25px; accent-color: var(--wave-theory); cursor: pointer; }
+        
+        canvas { background: var(--primary); width: 100%; height: 280px; border-radius: 12px; display: block; border: 3px solid #475569; margin-bottom: 10px; }
+        .btn-main { width: 100%; padding: 20px; background: var(--wave-live); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1.2rem; margin-bottom: 15px; box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3); transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
+        .btn-main.active { background: var(--error); box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.3); }
+        .view-label { color: var(--accent); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; margin: 20px 0 8px 5px; display: block; }
+
+        .questions-box { background: #fffbeb; border: 2px solid #fef3c7; padding: 25px; border-radius: 12px; margin-top: 20px; }
+        .questions-box h3 { margin-top: 0; color: #92400e; font-size: 1.1rem; }
+        .questions-box p { font-weight: 600; font-size: 1rem; margin-bottom: 12px; color: #451a03; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>🔊 Sound Properties Lab</h1>
-    <p>Adjust the sliders to see how sound waves change!</p>
+<div class="container">
+    <h1>🔊 S2 Science: Audio & Waveform Laboratory</h1>
 
-    <button id="toggleBtn" class="btn">Start Sound</button>
+    <section>
+        <h2>Part 1: Frequency & Hertz</h2>
+        <ul class="definition-list">
+            <li><b>Frequency:</b> The number of complete cycles per second.</li>
+            <li><b>Hertz (Hz):</b> The unit used to measure frequency.</li>
+            <li><b>Human Hearing Range:</b> Approximately 20 Hz to 20,000 Hz.</li>
+        </ul>
+        <div class="diagram-box">
+            <svg width="100%" height="220" viewBox="0 0 800 220">
+                <line x1="60" y1="30" x2="60" y2="190" stroke="var(--axis)" stroke-width="2" />
+                <line x1="60" y1="110" x2="750" y2="110" stroke="white" stroke-dasharray="8,4" stroke-opacity="0.3" />
+                <text x="25" y="35" fill="var(--axis)" font-size="14" font-weight="bold">1.0</text>
+                <text x="40" y="115" fill="var(--axis)" font-size="14" font-weight="bold">0</text>
+                <text x="20" y="195" fill="var(--axis)" font-size="14" font-weight="bold">-1.0</text>
+                <path d="M 60 110 Q 103 20, 146 110 T 232 110 T 318 110 T 405 110 T 491 110 T 577 110 T 663 110 T 750 110" fill="none" stroke="var(--wave-theory)" stroke-width="6" stroke-linecap="round"/>
+                <line x1="60" y1="30" x2="60" y2="190" stroke="var(--accent)" stroke-dasharray="4,4" />
+                <line x1="232" y1="30" x2="232" y2="190" stroke="var(--accent)" stroke-dasharray="4,4" />
+                <text x="75" y="205" fill="var(--accent)" font-weight="bold">1 Complete Cycle (1 Hz)</text>
+                <text x="380" y="215" fill="#f1f5f9" font-weight="bold">Time (seconds)</text>
+            </svg>
+        </div>
+    </section>
 
-    <div class="control-group">
-        <label for="freq">Frequency (Pitch): <span class="display" id="freqVal">440</span> Hz</label>
-        <input type="range" id="freq" min="100" max="2000" step="1" value="440">
-        <p><small><i>Vibrations per second: <span id="vibDisplay">440</span></i></small></p>
-    </div>
+    <section>
+        <h2>Part 2: Real-Time Wave Analysis</h2>
+        <div class="data-grid">
+            <div class="data-item"><b>Frequency</b> <span id="freqDisp">440 Hz</span></div>
+            <div class="data-item"><b>Loudness (Amplitude)</b> <span id="ampDisp">50%</span></div>
+        </div>
+        <button id="toggleBtn" class="btn-main">▶ START WAVEFORM & AUDIO</button>
+        <div class="controls">
+            <label>Frequency Slider (20 Hz to 20,000 Hz)</label>
+            <input type="range" id="freqSlider" min="20" max="20000" step="1" value="440">
+            <label>Amplitude Slider (0% to 100%)</label>
+            <input type="range" id="ampSlider" min="0" max="100" value="50">
+        </div>
 
-    <div class="control-group">
-        <label for="amp">Amplitude (Loudness): <span class="display" id="ampVal">50</span>%</label>
-        <input type="range" id="amp" min="0" max="100" step="1" value="50">
-    </div>
+        <span class="view-label">View A: Oscilloscope (Dynamic Time Zoom)</span>
+        <canvas id="liveCanvas"></canvas>
 
-    <canvas id="waveCanvas"></canvas>
+        <span class="view-label">View B: Constant Cycle View (Fixed 5 Cycles / Time-Scaled)</span>
+        <canvas id="wavelengthCanvas"></canvas>
+
+        <div class="questions-box">
+            <h3>📝 Lab Observations</h3>
+            <p>1. What pitch is produced when the frequency is low (e.g., ~100 Hz)?</p>
+            <p>2. To produce a sound that is both LOUDER and has a HIGHER PITCH, how should you adjust the sliders?</p>
+        </div>
+    </section>
 </div>
 
 <script>
-    let audioCtx;
-    let oscillator;
-    let gainNode;
-    let isPlaying = false;
-
-    const freqSlider = document.getElementById('freq');
-    const ampSlider = document.getElementById('amp');
-    const freqVal = document.getElementById('freqVal');
-    const vibDisplay = document.getElementById('vibDisplay');
-    const ampVal = document.getElementById('ampVal');
-    const toggleBtn = document.getElementById('toggleBtn');
-    const canvas = document.getElementById('waveCanvas');
-    const ctx = canvas.getContext('2d');
+    let audioCtx, oscillator, gainNode, isPlaying = false;
+    let globalTime = 0; 
+    const c1 = document.getElementById('liveCanvas');
+    const c2 = document.getElementById('wavelengthCanvas');
+    const ctx1 = c1.getContext('2d');
+    const ctx2 = c2.getContext('2d');
+    const freqSlider = document.getElementById('freqSlider');
+    const ampSlider = document.getElementById('ampSlider');
 
     function initAudio() {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         oscillator = audioCtx.createOscillator();
         gainNode = audioCtx.createGain();
-
         oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(freqSlider.value, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(ampSlider.value / 100, audioCtx.currentTime);
-
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
         oscillator.start();
+        audioCtx.suspend();
     }
 
-    toggleBtn.addEventListener('click', () => {
+    document.getElementById('toggleBtn').onclick = function() {
         if (!audioCtx) initAudio();
-        
-        if (isPlaying) {
-            audioCtx.suspend();
-            toggleBtn.textContent = "Start Sound";
-            toggleBtn.classList.remove('stop');
-        } else {
+        if (!isPlaying) {
             audioCtx.resume();
-            toggleBtn.textContent = "Stop Sound";
-            toggleBtn.classList.add('stop');
+            this.textContent = "■ STOP SIMULATION";
+            this.classList.add('active');
+        } else {
+            audioCtx.suspend();
+            this.textContent = "▶ START WAVEFORM & AUDIO";
+            this.classList.remove('active');
         }
         isPlaying = !isPlaying;
-    });
-
-    freqSlider.oninput = function() {
-        const val = this.value;
-        freqVal.textContent = val;
-        vibDisplay.textContent = val;
-        if (oscillator) {
-            oscillator.frequency.setTargetAtTime(val, audioCtx.currentTime, 0.05);
-        }
     };
 
-    ampSlider.oninput = function() {
-        const val = this.value;
-        ampVal.textContent = val;
-        if (gainNode) {
-            gainNode.gain.setTargetAtTime(val / 100, audioCtx.currentTime, 0.05);
+    function render() {
+        [ctx1, ctx2].forEach(ctx => {
+            ctx.clearRect(0, 0, c1.width, c1.height);
+            drawProAxes(ctx);
+        });
+
+        const pad = 70, w = c1.width - (pad * 2), h = c1.height - (pad * 2), midY = c1.height / 2;
+        const freq = parseFloat(freqSlider.value);
+        const amp = (ampSlider.value / 100) * (h / 2);
+
+        if (isPlaying) globalTime += 0.008; 
+
+        const adaptiveCycles = 4 + (Math.log10(freq / 20) * 12); 
+        ctx1.beginPath();
+        ctx1.strokeStyle = "#10b981";
+        ctx1.lineWidth = 5;
+        for (let x = 0; x <= w; x++) {
+            const y = midY + Math.sin(((globalTime + x/w) * adaptiveCycles * 2 * Math.PI)) * amp;
+            ctx1.lineTo(x + pad, y);
         }
-    };
+        ctx1.stroke();
 
-    // Drawing the wave
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.strokeStyle = '#2ecc71';
-        ctx.lineWidth = 3;
-
-        const frequency = freqSlider.value;
-        const amplitude = ampSlider.value / 2; // Scale for visual
-
-        for (let x = 0; x < canvas.width; x++) {
-            // Formula: y = Amplitude * sin(2 * PI * frequency * time)
-            const y = (canvas.height / 2) + amplitude * Math.sin(x * (frequency / 1000));
-            ctx.lineTo(x, y);
+        const fixedCycles = 5; 
+        ctx2.beginPath();
+        ctx2.strokeStyle = "#06b6d4";
+        ctx2.lineWidth = 5;
+        for (let x = 0; x <= w; x++) {
+            const y = midY + Math.sin(((globalTime + x/w) * fixedCycles * 2 * Math.PI)) * amp;
+            ctx2.lineTo(x + pad, y);
         }
+        ctx2.stroke();
+        
+        const timeWindow = (fixedCycles / freq).toFixed(5);
+        ctx2.fillStyle = "white";
+        ctx2.font = "bold 12px monospace";
+        ctx2.fillText(`Time Window: ${timeWindow}s`, w/2, c1.height - 15);
 
-        ctx.stroke();
-        requestAnimationFrame(draw);
+        document.getElementById('freqDisp').textContent = freq.toLocaleString() + " Hz";
+        document.getElementById('ampDisp').textContent = ampSlider.value + "%";
+
+        if(oscillator) {
+            oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
+            gainNode.gain.setTargetAtTime(ampSlider.value / 100, audioCtx.currentTime, 0.05);
+        }
+        requestAnimationFrame(render);
     }
-    draw();
+
+    function drawProAxes(ctx) {
+        const pad = 70, midY = c1.height / 2;
+        ctx.setLineDash([10, 5]);
+        ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        ctx.beginPath();
+        ctx.moveTo(pad, midY); ctx.lineTo(c1.width - pad, midY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = "#475569";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(pad, 40); ctx.lineTo(pad, c1.height - 40);
+        ctx.stroke();
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillText("Time (s) →", c1.width - pad - 60, midY + 20);
+    }
+
+    function resize() {
+        c1.width = c2.width = c1.parentElement.clientWidth - 60;
+        c1.height = c2.height = 280;
+    }
+    window.onresize = resize;
+    resize();
+    render();
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
