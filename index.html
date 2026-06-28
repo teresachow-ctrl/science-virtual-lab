@@ -723,8 +723,9 @@
 
         // Optimize drawing resolution automatically for dense high frequency waves
         const stepSize = freq > 1500 ? 0.5 : 1; 
+        // Modified: Changed from Cosine (Math.cos) to Sine (Math.sin) so that the wave starts at 0 (midY) on the left wall!
         for (let x = 0; x <= w; x += stepSize) {
-            const y = midY - Math.cos((x/w * waveCyclesIn10ms * 2 * Math.PI)) * amp;
+            const y = midY - Math.sin((x/w * waveCyclesIn10ms * 2 * Math.PI)) * amp;
             if (x === 0) {
                 ctx2.moveTo(x + paddingLeftRight, y);
             } else {
@@ -737,13 +738,17 @@
         if (ampValue > 15 && freq <= 1500) { 
             ctx2.fillStyle = "#f59e0b";
             ctx2.font = "bold 10px sans-serif";
+            ctx2.textAlign = "center";
             
-            // Peak at start
-            ctx2.fillText(dict.crestText, paddingLeftRight, midY - amp - 10);
+            // First crest is now located at exactly 1/4 (0.25) of the first wave cycle
+            if (waveCyclesIn10ms >= 0.25) {
+                const crestX = paddingLeftRight + (0.25 / waveCyclesIn10ms) * w;
+                ctx2.fillText(dict.crestText, crestX, midY - amp - 10);
+            }
             
-            // First trough at half-cycle
-            if (waveCyclesIn10ms >= 0.5) {
-                const troughX = paddingLeftRight + (0.5 / waveCyclesIn10ms) * w;
+            // First trough is now located at exactly 3/4 (0.75) of the first wave cycle
+            if (waveCyclesIn10ms >= 0.75) {
+                const troughX = paddingLeftRight + (0.75 / waveCyclesIn10ms) * w;
                 ctx2.fillText(dict.troughText, troughX, midY + amp + 18);
             }
         }
