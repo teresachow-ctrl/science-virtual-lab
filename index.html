@@ -708,7 +708,7 @@
                 const btnM2 = document.getElementById('btnModeAmp');
                 btnM2.removeAttribute('disabled');
                 btnM2.className = "btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95 unlock-animation";
-                btnM2.innerHTML = `📢 <span>${dict.modeAmpLabel}</span>`;
+                btnM2.innerHTML = `📢 <span id="modeAmpLabel">${dict.modeAmpLabel}</span>`;
                 
                 // Show M2 instructions in progress panel
                 document.getElementById('taskM1').classList.add('hidden');
@@ -742,7 +742,7 @@
                 const btnBoth = document.getElementById('btnModeBoth');
                 btnBoth.removeAttribute('disabled');
                 btnBoth.className = "btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95 unlock-animation";
-                btnBoth.innerHTML = `🧪 <span>${dict.modeBothLabel}</span>`;
+                btnBoth.innerHTML = `🧪 <span id="modeBothLabel">${dict.modeBothLabel}</span>`;
 
                 // Render Sandbox completed layout state
                 document.getElementById('taskM2').classList.add('hidden');
@@ -787,23 +787,25 @@
         
         // Reset active style on all mode buttons
         const modes = [
-            { id: 'btnModeFreq', mode: 'frequency', icon: '🎯', label: dict.modeFreqLabel },
-            { id: 'btnModeAmp', mode: 'amplitude', icon: '📢', label: dict.modeAmpLabel },
-            { id: 'btnModeBoth', mode: 'both', icon: '🧪', label: dict.modeBothLabel }
+            { id: 'btnModeFreq', mode: 'frequency' },
+            { id: 'btnModeAmp', mode: 'amplitude' },
+            { id: 'btnModeBoth', mode: 'both' }
         ];
 
+        // Safely adjust classes only to preserve button internal span IDs
         modes.forEach(m => {
             const btn = document.getElementById(m.id);
-            if (!btn.hasAttribute('disabled')) {
+            if (btn && !btn.hasAttribute('disabled')) {
                 btn.className = "btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95";
-                btn.innerHTML = `${m.icon} <span>${m.label}</span>`;
             }
         });
 
         const activeItem = modes.find(m => m.mode === mode);
         if (activeItem) {
             const activeBtn = document.getElementById(activeItem.id);
-            activeBtn.className = "btn-mode px-4 py-3 bg-cyan-500 text-white border-cyan-500 shadow-md text-xs md:text-sm font-bold rounded-xl cursor-pointer transition flex items-center justify-center gap-2 active:scale-95";
+            if (activeBtn) {
+                activeBtn.className = "btn-mode px-4 py-3 bg-cyan-500 text-white border-cyan-500 shadow-md text-xs md:text-sm font-bold rounded-xl cursor-pointer transition flex items-center justify-center gap-2 active:scale-95";
+            }
         }
 
         if (mode === 'frequency') {
