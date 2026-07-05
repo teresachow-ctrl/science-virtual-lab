@@ -212,7 +212,7 @@
     </section>
 
     <!-- EXTRA PART 3: HEARING TEST SUITE (20 Hz - 20,000 Hz) -->
-    <section class="bg-white border-2 border-purple-200 rounded-2xl shadow-md p-5 md:p-8 mb-6 relative overflow-hidden">
+    <section id="part3Section" class="bg-white border-2 border-purple-200 rounded-2xl shadow-md p-5 md:p-8 mb-6 relative overflow-hidden transition hover:border-purple-300">
         <div class="absolute top-0 left-0 w-2 h-full bg-purple-500"></div>
         
         <h2 id="part3Title" class="text-lg md:text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
@@ -479,6 +479,7 @@
     const toggleBtn = document.getElementById('toggleBtn');
     
     // Hearing Test Selectors
+    const part3Section = document.getElementById('part3Section');
     const testFreqSlider = document.getElementById('testFreqSlider');
     const testVolSlider = document.getElementById('testVolSlider');
     const testFreqVal = document.getElementById('testFreqVal');
@@ -857,8 +858,24 @@
         verifyProgression();
     };
 
+    // --- MUTEX EVENT: STOP PLAYING LAB SOUND ON ANY INTERACTION IN PART 3 ---
+    // Safely mutates the main lab's playback status if they touch, drag, or choose anything in Part 3
+    part3Section.addEventListener('mousedown', function() {
+        if (isPlaying) {
+            setMainAudioState(false);
+        }
+    });
+    part3Section.addEventListener('touchstart', function() {
+        if (isPlaying) {
+            setMainAudioState(false);
+        }
+    }, { passive: true });
+
     // --- HEARING TEST TESTER OBSERVERS ---
     testFreqSlider.oninput = function() {
+        if (isPlaying) {
+            setMainAudioState(false);
+        }
         const val = parseFloat(this.value);
         testFreqVal.textContent = val.toLocaleString() + " Hz";
         if (isTestPlaying && testOscillator) {
@@ -867,6 +884,9 @@
     };
 
     testVolSlider.oninput = function() {
+        if (isPlaying) {
+            setMainAudioState(false);
+        }
         const val = parseFloat(this.value);
         testVolVal.textContent = val + "%";
         if (isTestPlaying && testGainNode) {
@@ -874,9 +894,12 @@
         }
     };
 
-    // Quick presets triggers (Automatically plays hearing test tone cleanly)
+    // Quick presets triggers (Automatically plays hearing test tone cleanly and stops general lab sound)
     presetButtons.forEach(btn => {
         btn.onclick = function() {
+            if (isPlaying) {
+                setMainAudioState(false);
+            }
             const freq = parseInt(this.getAttribute('data-freq'));
             testFreqSlider.value = freq;
             testFreqVal.textContent = freq.toLocaleString() + " Hz";
@@ -989,6 +1012,12 @@
         document.getElementById('freqDisp').textContent = freq.toLocaleString() + " Hz";
         document.getElementById('ampDisp').textContent = ampValue + "%";
 
+        // 動態即時更新主實驗室的 Oscillator 頻率和 Gain (解決拖動滑桿時聲音不同步的問題)
+        if (isPlaying && mainOscillator && mainGainNode) {
+            mainOscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
+            mainGainNode.gain.setTargetAtTime(ampValue / 100, audioCtx.currentTime, 0.05);
+        }
+
         requestAnimationFrame(render);
     }
 
@@ -1032,4 +1061,3 @@
 </script>
 
 </body>
-</html>
