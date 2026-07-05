@@ -13,6 +13,14 @@
         .mono {
             font-family: 'JetBrains Mono', monospace;
         }
+        /* Custom animations for unlock celebrations */
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+        }
+        .unlock-animation {
+            animation: pulse-green 1s ease-in-out 2;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen p-3 md:p-6 transition-colors duration-300">
@@ -21,7 +29,7 @@
     
     <!-- Language Toggle Bar -->
     <div class="flex justify-between items-center mb-6">
-        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">S2 Science Lab Suite (v2.8)</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">S2 Science Lab Suite (v3.0 - Gamified)</span>
         <button id="langToggleBtn" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-400 text-slate-700 text-xs md:text-sm font-semibold rounded-lg shadow-sm transition active:scale-95 cursor-pointer">
             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
@@ -85,6 +93,43 @@
         </div>
     </section>
 
+    <!-- MISSION PROGRESS PANEL -->
+    <div id="progressPanel" class="bg-amber-50 border border-amber-200 p-4 md:p-6 rounded-2xl mb-6 shadow-sm">
+        <h3 id="panelTitle" class="text-sm font-extrabold uppercase tracking-wider text-amber-800 mb-3 flex items-center gap-1.5">
+            🏆 Lab Task Progression Checklist
+        </h3>
+        <div class="space-y-3" id="checklistContainer">
+            <!-- Mission 1 Tasks -->
+            <div id="taskM1" class="flex flex-col gap-2">
+                <div class="text-xs font-bold text-amber-950 uppercase tracking-wide">Mission 1 Unlock Requirements:</div>
+                <div class="flex items-center gap-2.5 text-slate-700 text-xs md:text-sm">
+                    <span id="chkLowFreq" class="w-5 h-5 flex items-center justify-center rounded-md border-2 border-amber-300 bg-white text-emerald-500 font-extrabold">⬜</span>
+                    <span id="txtLowFreq">Slide Frequency below 150 Hz (Feel the Bass)</span>
+                </div>
+                <div class="flex items-center gap-2.5 text-slate-700 text-xs md:text-sm">
+                    <span id="chkHighFreq" class="w-5 h-5 flex items-center justify-center rounded-md border-2 border-amber-300 bg-white text-emerald-500 font-extrabold">⬜</span>
+                    <span id="txtHighFreq">Slide Frequency above 1,500 Hz (Hear the High Pitch)</span>
+                </div>
+            </div>
+            <!-- Mission 2 Tasks -->
+            <div id="taskM2" class="flex flex-col gap-2 hidden">
+                <div class="text-xs font-bold text-amber-950 uppercase tracking-wide">Mission 2 Unlock Requirements:</div>
+                <div class="flex items-center gap-2.5 text-slate-700 text-xs md:text-sm">
+                    <span id="chkLowAmp" class="w-5 h-5 flex items-center justify-center rounded-md border-2 border-amber-300 bg-white text-emerald-500 font-extrabold">⬜</span>
+                    <span id="txtLowAmp">Slide Amplitude below 20% (Whisper Quiet)</span>
+                </div>
+                <div class="flex items-center gap-2.5 text-slate-700 text-xs md:text-sm">
+                    <span id="chkHighAmp" class="w-5 h-5 flex items-center justify-center rounded-md border-2 border-amber-300 bg-white text-emerald-500 font-extrabold">⬜</span>
+                    <span id="txtHighAmp">Slide Amplitude above 80% (Thunderous Volume)</span>
+                </div>
+            </div>
+            <!-- Complete Message -->
+            <div id="sandboxUnlockedMsg" class="text-emerald-700 font-extrabold text-xs md:text-sm flex items-center gap-1.5 hidden">
+                🎉 All missions completed! Sandbox Mode is fully unlocked! Explore freely!
+            </div>
+        </div>
+    </div>
+
     <!-- MISSION CONTROL COMPONENT -->
     <div class="bg-slate-100 border border-slate-200 p-4 md:p-6 rounded-2xl mb-6 shadow-sm">
         <div id="missionTitle" class="text-center text-xs md:text-sm font-extrabold uppercase tracking-wider text-slate-500 mb-4">
@@ -94,11 +139,11 @@
             <button id="btnModeFreq" class="btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95">
                 🎯 <span id="modeFreqLabel">Mission 1: Frequency Only</span>
             </button>
-            <button id="btnModeAmp" class="btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95">
-                📢 <span id="modeAmpLabel">Mission 2: Amplitude Only</span>
+            <button id="btnModeAmp" class="btn-mode px-4 py-3 bg-slate-100 text-slate-400 border border-slate-200 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-not-allowed transition flex items-center justify-center gap-2" disabled>
+                🔒 <span id="modeAmpLabel">Mission 2: Amplitude Only</span>
             </button>
-            <button id="btnModeBoth" class="btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95">
-                🧪 <span id="modeBothLabel">Sandbox: Both Controls</span>
+            <button id="btnModeBoth" class="btn-mode px-4 py-3 bg-slate-100 text-slate-400 border border-slate-200 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-not-allowed transition flex items-center justify-center gap-2" disabled>
+                🔒 <span id="modeBothLabel">Sandbox: Both Controls</span>
             </button>
         </div>
     </div>
@@ -129,7 +174,7 @@
 
         <!-- Dynamic Controllers -->
         <div class="bg-slate-50 border border-slate-200 p-5 md:p-8 rounded-xl mb-6">
-            <!-- Frequency Slider (Set back to student-friendly 5,000 Hz limit) -->
+            <!-- Frequency Slider -->
             <div id="freqControlGroup" class="mb-6">
                 <label id="sliderFreqLabel" class="font-bold text-xs md:text-sm text-slate-700 block mb-2">Frequency Slider (50 Hz to 5,000 Hz)</label>
                 <input type="range" id="freqSlider" min="50" max="5000" step="1" value="250" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-500">
@@ -297,7 +342,7 @@
             q2: "2. To produce a sound that is both LOUDER and has a HIGHER PITCH, how should you adjust the sliders?",
             toggleLang: "繁體中文",
             
-            // Part 3 (New Keys)
+            // Part 3
             part3Title: "Hearing & Age Limit Challenge",
             part3Subtitle: "Test the absolute limit of your ears. Can you hear the high-frequency 'Mosquito Ringtone'?",
             hearingWarning: "<b>Safety Warning:</b> High frequencies can be irritating. Always lower your headphone/speaker volume first to protect your hearing!",
@@ -314,14 +359,24 @@
             refAge30: "Age < 30",
             refAge20: "Age < 20",
             hearingFactTitle: "💡 Did You Know?",
-            hearingFactDesc: "As humans age, the tiny microscopic hair cells (stereocilia) inside the inner ear cochlea get damaged by loud noises and aging. The cells that detect high-pitch frequencies are at the entrance of the cochlea, meaning they wear out first. This permanent loss of hearing high pitches is called presbycusis."
+            hearingFactDesc: "As humans age, the tiny microscopic hair cells (stereocilia) inside the inner ear cochlea get damaged by loud noises and aging. The cells that detect high-pitch frequencies are at the entrance of the cochlea, meaning they wear out first. This permanent loss of hearing high pitches is called presbycusis.",
+
+            // Gamified Task labels
+            panelTitle: "🏆 Lab Task Progression Checklist",
+            txtLowFreq: "Slide Frequency below 150 Hz (Feel the Bass)",
+            txtHighFreq: "Slide Frequency above 1,500 Hz (Hear the High Pitch)",
+            txtLowAmp: "Slide Amplitude below 20% (Whisper Quiet)",
+            txtHighAmp: "Slide Amplitude above 80% (Thunderous Volume)",
+            sandboxUnlockedMsg: "🎉 All missions completed! Sandbox Mode is fully unlocked! Explore freely!",
+            toastM1Complete: "🌟 Mission 1 Complete! Mission 2: Amplitude Control is now UNLOCKED!",
+            toastM2Complete: "🔥 Mission 2 Complete! Sandbox Mode is now fully UNLOCKED!"
         },
         zh: {
             labTitle: "🔊 S2科學：聲波與波形實驗室",
             labSubtitle: "探索實體聲波傳播、頻率、振幅及波形之相互變化與科學特徵。",
             part1Title: "頻率與赫茲 (Frequency & Hertz)",
             defFreq: "<b>頻率：</b>指每秒振動次數。(完整「波形循環」的次數)",
-            defHz: "<b>赫茲 (Hz)：</b>用來度量頻率高低的國際標準單位。",
+            defHz: "<b>赫茲 (Hz)：</b>用來度量頻率高低的單位。",
             defRange: "<b>人類聽覺極限：</b>人耳約能接收 20 Hz 至 20,000 Hz。",
             diagCycleText: "1次完整週期 (1 Hz)",
             diagTimeText: "時間 (1秒)",
@@ -349,7 +404,7 @@
             q2: "2. 如果想要同時產生「更大聲（更響）」且「更高音調」的聲波，你應該如何調整這兩個滑桿？",
             toggleLang: "English",
 
-            // Part 3 (New Keys)
+            // Part 3
             part3Title: "額外部分 聽力與年齡極限挑戰",
             part3Subtitle: "測試你耳朵的絕對聽力極限。你聽得到高頻「蚊音」測試嗎？",
             hearingWarning: "<b>安全警告：</b>高頻測試音可能非常刺耳。進行測試前，請務必先將耳機或揚聲器音量調低，以保護雙耳聽力！",
@@ -366,17 +421,42 @@
             refAge30: "30歲以下聽力",
             refAge20: "20歲以下聽力",
             hearingFactTitle: "💡 你知道嗎？",
-            hearingFactDesc: "隨著人類年齡的增長，耳蝸內部用來感應聲波振動的「毛細胞」會因為老化或環境噪音而損壞。由於負責接收高頻率聲音的毛細胞位於耳蝸最前端的入口，因此最容易首先受損萎縮。這種因年齡增長而喪失高頻聽力的生理退化現象，稱為「老年性耳聾 (Presbycusis)」。"
+            hearingFactDesc: "隨著人類年齡的增長，耳蝸內部用來感應聲波振動的「毛細胞」會因為老化或環境噪音而損壞。由於負責接收高頻率聲音的毛細胞位於耳蝸最前端的入口，因此最容易首先受損萎縮。這種因年齡增長而喪失高頻聽力的生理退化現象，稱為「老年性耳聾 (Presbycusis)」。",
+
+            // Gamified Task labels
+            panelTitle: "🏆 實驗挑戰任務進度表",
+            txtLowFreq: "將頻率調整至 150 Hz 以下（體驗重低音效果）",
+            txtHighFreq: "將頻率調整至 1,500 Hz 以上（體驗尖銳高音效果）",
+            txtLowAmp: "將振幅（音量）調整至 20% 以下（體驗極微弱聲音）",
+            txtHighAmp: "將振幅（音量）調整至 80% 以上（體驗極宏亮聲音）",
+            sandboxUnlockedMsg: "🎉 恭喜完成所有挑戰任務！沙盒模式（雙重控制）已完全解鎖！可以自由探索！",
+            toastM1Complete: "🌟 任務 1 完成！「任務 2：僅限振幅」已成功解鎖！",
+            toastM2Complete: "🔥 任務 2 完成！「沙盒模式：雙重控制」已完全開放！"
         }
     };
 
     let currentLanguage = 'en';
 
-    // State Variables
-    let audioCtx, oscillator, gainNode, isPlaying = false;
-    let testOscillator, testGainNode, isTestPlaying = false;
+    // Audio Engine State Variables (Optimized for mutual exclusion)
+    let audioCtx = null;
+    let mainOscillator = null;
+    let mainGainNode = null;
+    let isPlaying = false;
+
+    let testOscillator = null;
+    let testGainNode = null;
+    let isTestPlaying = false;
+
     let globalTime = 0;
     let currentMode = 'frequency';
+
+    // Unlocking State Tracking
+    let isM1Complete = false;
+    let isM2Complete = false;
+    let hasDoneLowFreq = false;
+    let hasDoneHighFreq = false;
+    let hasDoneLowAmp = false;
+    let hasDoneHighAmp = false;
 
     // Element Selectors
     const c1 = document.getElementById('liveCanvas');
@@ -405,7 +485,6 @@
     const testVolVal = document.getElementById('testVolVal');
     const testToggleBtn = document.getElementById('testToggleBtn');
     const presetButtons = document.querySelectorAll('.preset-btn');
-    
     const langToggleBtn = document.getElementById('langToggleBtn');
 
     // Constants
@@ -427,9 +506,19 @@
         document.getElementById('diagCycleText').textContent = dict.diagCycleText;
         document.getElementById('diagTimeText').textContent = dict.diagTimeText;
 
+        // Progress Checklist Card
+        document.getElementById('panelTitle').innerHTML = dict.panelTitle;
+        document.getElementById('txtLowFreq').textContent = dict.txtLowFreq;
+        document.getElementById('txtHighFreq').textContent = dict.txtHighFreq;
+        document.getElementById('txtLowAmp').textContent = dict.txtLowAmp;
+        document.getElementById('txtHighAmp').textContent = dict.txtHighAmp;
+        document.getElementById('sandboxUnlockedMsg').textContent = dict.sandboxUnlockedMsg;
+
         // Modes
         document.getElementById('missionTitle').textContent = dict.missionTitle;
         document.getElementById('modeFreqLabel').textContent = dict.modeFreqLabel;
+        
+        // Locked / unlocked button states handled dynamically, but update inner label text
         document.getElementById('modeAmpLabel').textContent = dict.modeAmpLabel;
         document.getElementById('modeBothLabel').textContent = dict.modeBothLabel;
 
@@ -488,50 +577,236 @@
         updateLanguageUI();
     };
 
-    function initAudio() {
+    // --- SHARED WEB AUDIO INITIALIZER ---
+    function ensureAudioContext() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
-    }
-
-    function startMainAudio() {
-        initAudio();
-        if (!oscillator) {
-            oscillator = audioCtx.createOscillator();
-            gainNode = audioCtx.createGain();
-            oscillator.type = 'sine';
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
         }
-        audioCtx.resume();
     }
 
-    function stopMainAudio() {
-        if (audioCtx && isPlaying) {
-            audioCtx.suspend();
-            isPlaying = false;
-            const dict = translations[currentLanguage];
+    // --- MAIN EXPERIMENT WAVE SOUND CONTROL (Dynamic Volume Mutex) ---
+    function setMainAudioState(on) {
+        isPlaying = on;
+        ensureAudioContext();
+        
+        const dict = translations[currentLanguage];
+
+        if (on) {
+            // 1. Immediately mute/stop the Hearing Test
+            setHearingTestState(false);
+
+            // 2. Build Oscillator if not yet present
+            if (!mainOscillator) {
+                mainOscillator = audioCtx.createOscillator();
+                mainGainNode = audioCtx.createGain();
+                mainOscillator.type = 'sine';
+                mainOscillator.connect(mainGainNode);
+                mainGainNode.connect(audioCtx.destination);
+                mainOscillator.start();
+            }
+
+            // 3. Set current sliders values immediately
+            const freq = currentMode === 'amplitude' ? DEFAULT_FREQ : parseFloat(freqSlider.value);
+            const ampVal = currentMode === 'frequency' ? DEFAULT_AMP : parseFloat(ampSlider.value);
+
+            mainOscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
+            mainGainNode.gain.setTargetAtTime(ampVal / 100, audioCtx.currentTime, 0.05);
+
+            toggleBtn.textContent = dict.btnStop;
+            toggleBtn.classList.remove('bg-emerald-500', 'shadow-emerald-500/20');
+            toggleBtn.classList.add('bg-red-500', 'shadow-red-500/20');
+        } else {
+            // Smoothly mute the main sound node instead of suspending context
+            if (mainGainNode) {
+                mainGainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+            }
             toggleBtn.textContent = dict.btnStart;
             toggleBtn.classList.remove('bg-red-500', 'shadow-red-500/20');
             toggleBtn.classList.add('bg-emerald-500', 'shadow-emerald-500/20');
         }
     }
 
+    // --- BONUS PART 3: HEARING TEST TONE CONTROL (Dynamic Volume Mutex) ---
+    function setHearingTestState(on) {
+        isTestPlaying = on;
+        ensureAudioContext();
+
+        const dict = translations[currentLanguage];
+
+        if (on) {
+            // 1. Immediately mute/stop the Main Wave Lab audio
+            setMainAudioState(false);
+
+            // 2. Build Hearing Test sound nodes if not present
+            if (!testOscillator) {
+                testOscillator = audioCtx.createOscillator();
+                testGainNode = audioCtx.createGain();
+                testOscillator.type = 'sine';
+                testOscillator.connect(testGainNode);
+                testGainNode.connect(audioCtx.destination);
+                testOscillator.start();
+            }
+
+            // 3. Set sliders parameters
+            const f = parseFloat(testFreqSlider.value);
+            const v = parseFloat(testVolSlider.value) / 100;
+
+            testOscillator.frequency.setTargetAtTime(f, audioCtx.currentTime, 0.02);
+            testGainNode.gain.setTargetAtTime(v, audioCtx.currentTime, 0.02);
+
+            testToggleBtn.textContent = dict.btnTestStop;
+            testToggleBtn.classList.remove('bg-purple-600', 'shadow-purple-600/20');
+            testToggleBtn.classList.add('bg-red-500', 'shadow-red-500/20');
+        } else {
+            // Smoothly mute the hearing test node
+            if (testGainNode) {
+                testGainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+            }
+            testToggleBtn.textContent = dict.btnTestPlay;
+            testToggleBtn.classList.remove('bg-red-500', 'shadow-red-500/20');
+            testToggleBtn.classList.add('bg-purple-600', 'shadow-purple-600/20');
+        }
+    }
+
+    // Main Audio On/Off Button Toggle
+    toggleBtn.onclick = function() {
+        setMainAudioState(!isPlaying);
+    };
+
+    // Hearing Test Audio On/Off Toggle
+    testToggleBtn.onclick = function() {
+        setHearingTestState(!isTestPlaying);
+    };
+
+    // --- GAME PROGRESSION AND VERIFICATION LOGIC ---
+    function verifyProgression() {
+        const freq = parseFloat(freqSlider.value);
+        const amp = parseFloat(ampSlider.value);
+        const dict = translations[currentLanguage];
+
+        // 1. Check Mission 1 criteria (Frequency Only)
+        if (currentMode === 'frequency') {
+            if (freq < 150) {
+                hasDoneLowFreq = true;
+                document.getElementById('chkLowFreq').textContent = "✅";
+            }
+            if (freq > 1500) {
+                hasDoneHighFreq = true;
+                document.getElementById('chkHighFreq').textContent = "✅";
+            }
+
+            if (hasDoneLowFreq && hasDoneHighFreq && !isM1Complete) {
+                isM1Complete = true;
+                
+                // Active celebration animation and toast alert
+                showCelebrationBanner(dict.toastM1Complete);
+                
+                // Unlock Mission 2 Button in control selection bar
+                const btnM2 = document.getElementById('btnModeAmp');
+                btnM2.removeAttribute('disabled');
+                btnM2.className = "btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95 unlock-animation";
+                btnM2.innerHTML = `📢 <span>${dict.modeAmpLabel}</span>`;
+                
+                // Show M2 instructions in progress panel
+                document.getElementById('taskM1').classList.add('hidden');
+                document.getElementById('taskM2').classList.remove('hidden');
+
+                // Shift view directly into Mission 2
+                setTimeout(() => {
+                    btnM2.classList.remove('unlock-animation');
+                    setLabMode('amplitude');
+                }, 1800);
+            }
+        }
+
+        // 2. Check Mission 2 criteria (Amplitude Only)
+        if (currentMode === 'amplitude') {
+            if (amp < 20) {
+                hasDoneLowAmp = true;
+                document.getElementById('chkLowAmp').textContent = "✅";
+            }
+            if (amp > 80) {
+                hasDoneHighAmp = true;
+                document.getElementById('chkHighAmp').textContent = "✅";
+            }
+
+            if (hasDoneLowAmp && hasDoneHighAmp && !isM2Complete) {
+                isM2Complete = true;
+                
+                showCelebrationBanner(dict.toastM2Complete);
+
+                // Unlock Sandbox Button
+                const btnBoth = document.getElementById('btnModeBoth');
+                btnBoth.removeAttribute('disabled');
+                btnBoth.className = "btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95 unlock-animation";
+                btnBoth.innerHTML = `🧪 <span>${dict.modeBothLabel}</span>`;
+
+                // Render Sandbox completed layout state
+                document.getElementById('taskM2').classList.add('hidden');
+                document.getElementById('sandboxUnlockedMsg').classList.remove('hidden');
+
+                setTimeout(() => {
+                    btnBoth.classList.remove('unlock-animation');
+                    setLabMode('both');
+                }, 1800);
+            }
+        }
+    }
+
+    // Creates an elegant non-alert pop-up toast in center-screen
+    function showCelebrationBanner(message) {
+        const toast = document.createElement('div');
+        toast.className = "fixed top-12 left-1/2 -translate-x-1/2 px-6 py-4 bg-emerald-500 text-white font-extrabold text-sm md:text-base rounded-2xl shadow-2xl z-50 transition transform scale-90 opacity-0 pointer-events-none duration-300 flex items-center gap-3";
+        toast.innerHTML = `
+            <svg class="w-6 h-6 text-emerald-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+        
+        // Trigger reveal reflow
+        setTimeout(() => {
+            toast.className = toast.className.replace('scale-90 opacity-0 pointer-events-none', 'scale-100 opacity-100');
+        }, 50);
+
+        // Auto remove
+        setTimeout(() => {
+            toast.className = toast.className.replace('scale-100 opacity-100', 'scale-90 opacity-0 pointer-events-none');
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+    }
+
     // Set up Laboratory Mode Transitions with Tailwind utilities
     function setLabMode(mode) {
         currentMode = mode;
+        const dict = translations[currentLanguage];
         
-        // Reset active style on all buttons
-        [btnModeFreq, btnModeAmp, btnModeBoth].forEach(btn => {
-            btn.classList.remove('bg-cyan-500', 'text-white', 'border-cyan-500', 'shadow-md');
-            btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+        // Reset active style on all mode buttons
+        const modes = [
+            { id: 'btnModeFreq', mode: 'frequency', icon: '🎯', label: dict.modeFreqLabel },
+            { id: 'btnModeAmp', mode: 'amplitude', icon: '📢', label: dict.modeAmpLabel },
+            { id: 'btnModeBoth', mode: 'both', icon: '🧪', label: dict.modeBothLabel }
+        ];
+
+        modes.forEach(m => {
+            const btn = document.getElementById(m.id);
+            if (!btn.hasAttribute('disabled')) {
+                btn.className = "btn-mode px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs md:text-sm font-bold rounded-xl shadow-sm cursor-pointer transition flex items-center justify-center gap-2 active:scale-95";
+                btn.innerHTML = `${m.icon} <span>${m.label}</span>`;
+            }
         });
 
+        const activeItem = modes.find(m => m.mode === mode);
+        if (activeItem) {
+            const activeBtn = document.getElementById(activeItem.id);
+            activeBtn.className = "btn-mode px-4 py-3 bg-cyan-500 text-white border-cyan-500 shadow-md text-xs md:text-sm font-bold rounded-xl cursor-pointer transition flex items-center justify-center gap-2 active:scale-95";
+        }
+
         if (mode === 'frequency') {
-            btnModeFreq.classList.add('bg-cyan-500', 'text-white', 'border-cyan-500', 'shadow-md');
-            btnModeFreq.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
-            
             freqCard.classList.remove('hidden');
             freqControlGroup.classList.remove('hidden');
             
@@ -541,9 +816,6 @@
             ampSlider.value = DEFAULT_AMP;
         } 
         else if (mode === 'amplitude') {
-            btnModeAmp.classList.add('bg-cyan-500', 'text-white', 'border-cyan-500', 'shadow-md');
-            btnModeAmp.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
-            
             ampCard.classList.remove('hidden');
             ampControlGroup.classList.remove('hidden');
             
@@ -553,15 +825,20 @@
             freqSlider.value = DEFAULT_FREQ;
         } 
         else if (mode === 'both') {
-            btnModeBoth.classList.add('bg-cyan-500', 'text-white', 'border-cyan-500', 'shadow-md');
-            btnModeBoth.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
-            
             freqCard.classList.remove('hidden');
             freqControlGroup.classList.remove('hidden');
             ampCard.classList.remove('hidden');
             ampControlGroup.classList.remove('hidden');
         }
         
+        // Dynamically synchronise live frequency to main sound oscillator if playing
+        if (isPlaying && mainOscillator) {
+            const freq = mode === 'amplitude' ? DEFAULT_FREQ : parseFloat(freqSlider.value);
+            const ampVal = mode === 'frequency' ? DEFAULT_AMP : parseFloat(ampSlider.value);
+            mainOscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
+            mainGainNode.gain.setTargetAtTime(ampVal / 100, audioCtx.currentTime, 0.05);
+        }
+
         resize();
     }
 
@@ -569,80 +846,16 @@
     btnModeAmp.onclick = () => setLabMode('amplitude');
     btnModeBoth.onclick = () => setLabMode('both');
 
-    toggleBtn.onclick = function() {
-        stopHearingTest(); // Mutually exclusive: turn off hearing test if playing
-        initAudio();
-        const dict = translations[currentLanguage];
-        if (!isPlaying) {
-            startMainAudio();
-            this.textContent = dict.btnStop;
-            this.classList.remove('bg-emerald-500', 'shadow-emerald-500/20');
-            this.classList.add('bg-red-500', 'shadow-red-500/20');
-            isPlaying = true;
-        } else {
-            audioCtx.suspend();
-            this.textContent = dict.btnStart;
-            this.classList.remove('bg-red-500', 'shadow-red-500/20');
-            this.classList.add('bg-emerald-500', 'shadow-emerald-500/20');
-            isPlaying = false;
-        }
+    // Frequency and Amplitude sliders change observers
+    freqSlider.oninput = function() {
+        verifyProgression();
     };
 
-    // --- HEARING TEST ENGINE ---
-    function startHearingTest() {
-        stopMainAudio(); // Stop general simulation wave audio to prevent overlap
-        initAudio();
-        
-        const f = parseFloat(testFreqSlider.value);
-        const v = parseFloat(testVolSlider.value) / 100;
-
-        if (!testOscillator) {
-            testOscillator = audioCtx.createOscillator();
-            testGainNode = audioCtx.createGain();
-            testOscillator.type = 'sine';
-            testOscillator.connect(testGainNode);
-            testGainNode.connect(audioCtx.destination);
-            testOscillator.start();
-        }
-
-        testOscillator.frequency.setValueAtTime(f, audioCtx.currentTime);
-        testGainNode.gain.setValueAtTime(v, audioCtx.currentTime);
-
-        audioCtx.resume();
-        isTestPlaying = true;
-        
-        const dict = translations[currentLanguage];
-        testToggleBtn.textContent = dict.btnTestStop;
-        testToggleBtn.classList.remove('bg-purple-600', 'shadow-purple-600/20');
-        testToggleBtn.classList.add('bg-red-500', 'shadow-red-500/20');
-    }
-
-    function stopHearingTest() {
-        if (testOscillator) {
-            try {
-                testOscillator.stop();
-            } catch(e) {}
-            testOscillator.disconnect();
-            testGainNode.disconnect();
-            testOscillator = null;
-            testGainNode = null;
-        }
-        isTestPlaying = false;
-        const dict = translations[currentLanguage];
-        testToggleBtn.textContent = dict.btnTestPlay;
-        testToggleBtn.classList.remove('bg-red-500', 'shadow-red-500/20');
-        testToggleBtn.classList.add('bg-purple-600', 'shadow-purple-600/20');
-    }
-
-    testToggleBtn.onclick = function() {
-        if (!isTestPlaying) {
-            startHearingTest();
-        } else {
-            stopHearingTest();
-        }
+    ampSlider.oninput = function() {
+        verifyProgression();
     };
 
-    // Listeners for Hearing Test Sliders
+    // --- HEARING TEST TESTER OBSERVERS ---
     testFreqSlider.oninput = function() {
         const val = parseFloat(this.value);
         testFreqVal.textContent = val.toLocaleString() + " Hz";
@@ -659,22 +872,18 @@
         }
     };
 
-    // Quick Test presets
+    // Quick presets triggers (Automatically plays hearing test tone cleanly)
     presetButtons.forEach(btn => {
         btn.onclick = function() {
             const freq = parseInt(this.getAttribute('data-freq'));
             testFreqSlider.value = freq;
             testFreqVal.textContent = freq.toLocaleString() + " Hz";
             
-            // Toggle highlight
-            presetButtons.forEach(b => b.classList.remove('border-purple-500', 'bg-purple-50'));
-            this.classList.add('border-purple-500', 'bg-purple-50');
+            presetButtons.forEach(b => b.className = b.className.replace('border-purple-500 bg-purple-50', 'border-slate-200 bg-slate-100'));
+            this.className = this.className.replace('border-slate-200 bg-slate-100', 'border-purple-500 bg-purple-50');
 
-            if (isTestPlaying && testOscillator) {
-                testOscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
-            } else {
-                startHearingTest();
-            }
+            // Play/switch test tone immediately
+            setHearingTestState(true);
         };
     });
 
@@ -702,7 +911,6 @@
         if (isPlaying) globalTime += 0.008; 
 
         // --- DRAW VIEW A: Oscilloscope ---
-        // Dynamically compress logarithmic scaling so that 5,000Hz remains visually readable
         const adaptiveCycles = 2 + (Math.log10(freq / 50) * 11); 
         ctx1.beginPath();
         ctx1.strokeStyle = "#10b981";
@@ -714,16 +922,13 @@
         ctx1.stroke();
 
         // --- DRAW VIEW B: Snapshot camera ---
-        // At 5,000 Hz, 10ms (0.01s) contains 50 wave cycles.
         const waveCyclesIn10ms = 0.01 * freq; 
 
         ctx2.beginPath();
         ctx2.strokeStyle = "#06b6d4";
         ctx2.lineWidth = c2.width > 600 ? 5 : 3;
 
-        // Optimize drawing resolution automatically for dense high frequency waves
         const stepSize = freq > 1500 ? 0.5 : 1; 
-        // Modified: Changed from Cosine (Math.cos) to Sine (Math.sin) so that the wave starts at 0 (midY) on the left wall!
         for (let x = 0; x <= w; x += stepSize) {
             const y = midY - Math.sin((x/w * waveCyclesIn10ms * 2 * Math.PI)) * amp;
             if (x === 0) {
@@ -740,13 +945,11 @@
             ctx2.font = "bold 10px sans-serif";
             ctx2.textAlign = "center";
             
-            // First crest is now located at exactly 1/4 (0.25) of the first wave cycle
             if (waveCyclesIn10ms >= 0.25) {
                 const crestX = paddingLeftRight + (0.25 / waveCyclesIn10ms) * w;
                 ctx2.fillText(dict.crestText, crestX, midY - amp - 10);
             }
             
-            // First trough is now located at exactly 3/4 (0.75) of the first wave cycle
             if (waveCyclesIn10ms >= 0.75) {
                 const troughX = paddingLeftRight + (0.75 / waveCyclesIn10ms) * w;
                 ctx2.fillText(dict.troughText, troughX, midY + amp + 18);
@@ -784,10 +987,6 @@
         document.getElementById('freqDisp').textContent = freq.toLocaleString() + " Hz";
         document.getElementById('ampDisp').textContent = ampValue + "%";
 
-        if (oscillator && isPlaying) {
-            oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
-            gainNode.gain.setTargetAtTime(ampValue / 100, audioCtx.currentTime, 0.05);
-        }
         requestAnimationFrame(render);
     }
 
